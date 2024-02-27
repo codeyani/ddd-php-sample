@@ -1,0 +1,4 @@
+home_get:
+  path: /
+  controller: Codeyani\Apps\Backoffice\Frontend\Controller\Users\UsersGetWebController
+  methods:  [GET]

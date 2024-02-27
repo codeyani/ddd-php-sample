@@ -1,0 +1,13 @@
+framework:
+  test: true
+
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Codeyani\Tests\:
+    resource: '../../../../tests'
+
+  # -- IMPLEMENTATIONS SELECTOR --
+  Codeyani\Shared\Domain\Bus\Event\EventBus: '@Codeyani\Shared\Infrastructure\Bus\Event\InMemory\InMemorySymfonyEventBus'

@@ -1,0 +1,24 @@
+{
+  "mappings": {
+    "users": {
+      "properties": {
+        "id": {
+          "type": "keyword",
+          "index": true
+        },
+        "email": {
+          "type": "text",
+          "index": true
+        },
+        "firstName": {
+          "type": "text",
+          "index": true
+        },
+        "lastName": {
+          "type": "text",
+          "index": true
+        }
+      }
+    }
+  }
+}

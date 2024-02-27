@@ -1,0 +1,14 @@
+framework:
+  test: true
+
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  Codeyani\Tests\:
+    resource: '../../../../tests'
+
+  # Instance selector
+  Codeyani\Shared\Domain\RandomNumberGenerator: '@Codeyani\Tests\Shared\Infrastructure\ConstantRandomNumberGenerator'
+#  Codeyani\Shared\Domain\Bus\Event\EventBus: '@Codeyani\Shared\Infrastructure\Bus\Event\InMemory\InMemorySymfonyEventBus'

@@ -1,0 +1,10 @@
+{% extends 'master.html.twig' %}
+
+{% block page_title %}Users{% endblock %}
+
+{% block main %}
+    {{ include('pages/users/partials/new_user_form.html.twig') }}
+    <div class="clearfix mb-10"></div>
+    <hr class="mb-10">
+    {{ include('pages/users/partials/list_users.html.twig') }}
+{% endblock %}

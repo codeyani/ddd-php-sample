@@ -1,0 +1,98 @@
+imports:
+  - { resource: ../../../../src/Backoffice/Shared/Infrastructure/Symfony/DependencyInjection/backoffice_services.yaml }
+
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+
+  # Configure
+  _instanceof:
+    Codeyani\Shared\Domain\Bus\Event\DomainEventSubscriber:
+      tags: ['codeyani.domain_event_subscriber']
+
+    Codeyani\Shared\Domain\Bus\Command\CommandHandler:
+      tags: ['codeyani.command_handler']
+
+    Codeyani\Shared\Domain\Bus\Query\QueryHandler:
+      tags: ['codeyani.query_handler']
+
+  Codeyani\Apps\Backoffice\Backend\Controller\:
+    resource: '../src/Controller'
+    tags: ['controller.service_arguments']
+
+
+  # Wire
+  Codeyani\Shared\:
+    resource: '../../../../src/Shared'
+
+  Codeyani\Backoffice\:
+    resource: '../../../../src/Backoffice'
+
+  # -- TAGGING --
+  Codeyani\Shared\Infrastructure\Bus\Event\InMemory\InMemorySymfonyEventBus:
+    arguments: [!tagged codeyani.domain_event_subscriber]
+    lazy: true
+
+  Codeyani\Shared\Infrastructure\Bus\Event\DomainEventMapping:
+    arguments: [!tagged codeyani.domain_event_subscriber]
+
+  Codeyani\Shared\Infrastructure\Bus\Event\DomainEventSubscriberLocator:
+    arguments: [!tagged codeyani.domain_event_subscriber]
+
+  Codeyani\Shared\Infrastructure\Doctrine\DatabaseConnections:
+    arguments: [!tagged codeyani.database_connection]
+
+  Codeyani\Shared\Infrastructure\Symfony\AddJsonBodyToRequestListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+  Codeyani\Shared\Infrastructure\Symfony\ApiExceptionListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.exception, method: onException }
+
+  Codeyani\Shared\Infrastructure\Symfony\BasicHttpAuthMiddleware:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
+
+  # -- APP DEFINITIONS --
+  # Command/Query Handlers
+  Codeyani\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus:
+    arguments: [!tagged codeyani.command_handler]
+
+  Codeyani\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus:
+    arguments: [!tagged codeyani.query_handler]
+
+  # RabbitMQ
+  Codeyani\Shared\Infrastructure\Bus\Event\RabbitMq\RabbitMqConnection:
+    arguments:
+      - host: '%env(RABBITMQ_HOST)%'
+        port: '%env(RABBITMQ_PORT)%'
+        vhost: '%env(RABBITMQ_MOOC_VHOST)%'
+        login: '%env(RABBITMQ_LOGIN)%'
+        password: '%env(RABBITMQ_PASSWORD)%'
+        read_timeout: 2
+        write_timeout: 2
+        connect_timeout: 5
+
+  Codeyani\Shared\Infrastructure\Bus\Event\RabbitMq\RabbitMqEventBus:
+    arguments: ['@Codeyani\Shared\Infrastructure\Bus\Event\RabbitMq\RabbitMqConnection', '%env(RABBITMQ_EXCHANGE)%']
+
+  Codeyani\Shared\Infrastructure\Elasticsearch\ElasticsearchClient:
+    factory: '@Codeyani\Shared\Infrastructure\Elasticsearch\ElasticsearchClientFactory'
+    arguments:
+      - '%env(BACKOFFICE_ELASTICSEARCH_HOST)%'
+      - '%env(BACKOFFICE_ELASTICSEARCH_INDEX_PREFIX)%'
+      - '%kernel.project_dir%/../../../etc/databases/backoffice'
+      - '%env(APP_ENV)%'
+    public: true
+
+  Codeyani\Shared\Infrastructure\Bus\Event\WithMonitoring\WithPrometheusMonitoringEventBus:
+    arguments: ['@Codeyani\Shared\Infrastructure\Monitoring\PrometheusMonitor', 'backoffice_backend', '@Codeyani\Shared\Infrastructure\Bus\Event\RabbitMq\RabbitMqEventBus']
+
+  # -- IMPLEMENTATIONS SELECTOR --
+
+  # -- IMPLEMENTATIONS SELECTOR --
+  Codeyani\Shared\Domain\Bus\Event\EventBus: '@Codeyani\Shared\Infrastructure\Bus\Event\WithMonitoring\WithPrometheusMonitoringEventBus'
+  Codeyani\Backoffice\Users\Domain\BackofficeUserRepository: '@Codeyani\Backoffice\Users\Infrastructure\Persistence\ElasticsearchBackofficeUserRepository'

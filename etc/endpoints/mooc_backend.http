@@ -1,0 +1,11 @@
+# Create a user
+PUT localhost:8030/users/{{$uuid}}
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "firstName": "test",
+  "lastName": "test",
+}
+
+###

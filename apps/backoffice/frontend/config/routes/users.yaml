@@ -1,0 +1,9 @@
+users_get:
+  path: /users
+  controller: Codeyani\Apps\Backoffice\Frontend\Controller\Users\UsersGetWebController
+  methods:  [GET]
+
+users_post:
+  path: /users
+  controller: Codeyani\Apps\Backoffice\Frontend\Controller\Users\UsersPostWebController
+  methods:  [POST]

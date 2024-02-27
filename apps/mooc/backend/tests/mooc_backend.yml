@@ -1,0 +1,29 @@
+mooc_backend:
+  extensions:
+    FriendsOfBehat\SymfonyExtension:
+      kernel:
+        class: Codeyani\Apps\Mooc\Backend\MoocBackendKernel
+      bootstrap: apps/bootstrap.php
+    Behat\MinkExtension:
+      sessions:
+        symfony:
+          symfony: ~
+      base_url: ''
+
+  suites:
+    health_check:
+      paths: [ apps/mooc/backend/tests/features/health_check ]
+      contexts:
+        - Codeyani\Tests\Shared\Infrastructure\Behat\ApiContext
+
+    users:
+      paths: [ apps/mooc/backend/tests/features/users ]
+      contexts:
+        - Codeyani\Tests\Shared\Infrastructure\Behat\ApplicationFeatureContext
+        - Codeyani\Tests\Shared\Infrastructure\Behat\ApiContext
+
+    users_counter:
+      paths: [ apps/mooc/backend/tests/features/users_counter ]
+      contexts:
+        - Codeyani\Tests\Shared\Infrastructure\Behat\ApplicationFeatureContext
+        - Codeyani\Tests\Shared\Infrastructure\Behat\ApiContext
